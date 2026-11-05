@@ -19,7 +19,8 @@ App iOS de tri de photos avec une interface à swipe.
 | Photos | PhotoKit (`PHAsset`, `PHCachingImageManager`) |
 | Persistance | SwiftData (décisions de tri) |
 | État | `@Observable` (Observation) |
-| iOS minimum | 17.0 |
+| Design | Liquid Glass (`glassEffect`, `.glass` / `.glassProminent`, `GlassEffectContainer`) |
+| iOS minimum | 26.0 |
 
 ## Organisation du code
 
@@ -51,6 +52,14 @@ PhotoSwipe/
    et remet la photo en tête de pile.
 4. La corbeille = les `SortDecision` dont la décision est `.trash`. « Tout supprimer » appelle
    `PHAssetChangeRequest.deleteAssets` (une seule alerte système), puis efface ces décisions.
+
+## Design Liquid Glass
+
+- Les boutons ✕ / ↩ / ♥ flottent **sur** la photo (le verre réfracte l'image) dans un `GlassEffectContainer`,
+  avec `.glassEffect(.regular.interactive(), in: .circle)`.
+- Filtres : `.glassProminent` (actif, teinté couleur d'accent) / `.glass` (inactif).
+- Date de la photo : pastille en verre en haut de la carte, qui s'efface pendant le glissement.
+- Barre de navigation et feuilles : Liquid Glass automatique du système.
 
 ## Points d'attention
 

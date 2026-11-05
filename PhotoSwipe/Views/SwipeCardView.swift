@@ -13,7 +13,9 @@ struct SwipeCardView: View {
 
     var body: some View {
         AssetImageView(asset: asset, contentMode: .fill)
-            .overlay(alignment: .bottomLeading) { infoBar }
+            .overlay(alignment: .top) {
+                infoPill.opacity(1 - progress)
+            }
             .overlay(alignment: .topLeading) {
                 stamp("GARDER", color: .green, angle: -15)
                     .opacity(offset.width > 0 ? progress : 0)
@@ -28,20 +30,21 @@ struct SwipeCardView: View {
             .rotationEffect(.degrees(Double(offset.width) / 20), anchor: .bottom)
     }
 
-    private var infoBar: some View {
+    /// Pastille en verre posée sur la photo : date et type.
+    private var infoPill: some View {
         HStack(spacing: 8) {
             if asset.mediaSubtypes.contains(.photoScreenshot) {
-                Label("Screenshot", systemImage: MediaCategory.screenshot.systemImage)
+                Image(systemName: MediaCategory.screenshot.systemImage)
             }
             if let date = asset.creationDate {
                 Text(date, format: .dateTime.day().month(.wide).year())
             }
         }
         .font(.subheadline.weight(.semibold))
-        .foregroundStyle(.white)
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(LinearGradient(colors: [.clear, .black.opacity(0.6)], startPoint: .top, endPoint: .bottom))
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .glassEffect(.regular, in: .capsule)
+        .padding(.top, 16)
     }
 
     private func stamp(_ text: String, color: Color, angle: Double) -> some View {

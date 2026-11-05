@@ -52,12 +52,11 @@ struct TrashView: View {
                         }
                         .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.glassProminent)
                     .tint(.red)
                     .controlSize(.large)
                     .disabled(isDeleting)
                     .padding()
-                    .background(.bar)
                 }
             }
             .confirmationDialog("Supprimer ces photos ?", isPresented: $confirmEmpty, titleVisibility: .visible) {

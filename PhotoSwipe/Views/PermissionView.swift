@@ -39,7 +39,7 @@ struct PermissionView: View {
                 Text(isDenied ? "Ouvrir Réglages" : "Autoriser l'accès aux photos")
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.glassProminent)
             .controlSize(.large)
         }
         .padding(24)

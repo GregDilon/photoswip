@@ -16,8 +16,11 @@ struct SortingView: View {
             VStack(spacing: 16) {
                 filterBar
                 if isLimitedAccess { limitedBanner }
+                // Les boutons flottent sur la photo : le verre réfracte l'image en dessous.
                 cardStack
-                controls
+                    .overlay(alignment: .bottom) {
+                        controls.padding(.bottom, 20)
+                    }
             }
             .padding(.horizontal)
             .padding(.bottom, 8)
@@ -49,30 +52,43 @@ struct SortingView: View {
 
     private var filterBar: some View {
         HStack(spacing: 8) {
-            ForEach(MediaCategory.allCases) { category in
-                let isOn = viewModel.selectedCategories.contains(category)
-                Button {
-                    if isOn {
-                        viewModel.selectedCategories.remove(category)
-                    } else {
-                        viewModel.selectedCategories.insert(category)
+            GlassEffectContainer(spacing: 8) {
+                HStack(spacing: 8) {
+                    ForEach(MediaCategory.allCases) { category in
+                        filterButton(category)
                     }
-                } label: {
-                    Label(category.title, systemImage: category.systemImage)
-                        .font(.subheadline.weight(.medium))
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(Capsule().fill(isOn ? Color.accentColor : Color(.secondarySystemFill)))
-                        .foregroundStyle(isOn ? .white : .primary)
                 }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(isOn ? .isSelected : [])
             }
             Spacer()
             Text("\(viewModel.queue.count) à trier")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .monospacedDigit()
+        }
+    }
+
+    /// Filtre actif : verre teinté de la couleur d'accent. Inactif : verre neutre.
+    @ViewBuilder
+    private func filterButton(_ category: MediaCategory) -> some View {
+        let isOn = viewModel.selectedCategories.contains(category)
+        let button = Button {
+            withAnimation(.smooth) {
+                if isOn {
+                    viewModel.selectedCategories.remove(category)
+                } else {
+                    viewModel.selectedCategories.insert(category)
+                }
+            }
+        } label: {
+            Label(category.title, systemImage: category.systemImage)
+                .font(.subheadline.weight(.medium))
+        }
+        .accessibilityAddTraits(isOn ? .isSelected : [])
+
+        if isOn {
+            button.buttonStyle(.glassProminent)
+        } else {
+            button.buttonStyle(.glass)
         }
     }
 
@@ -123,7 +139,7 @@ struct SortingView: View {
             } actions: {
                 if viewModel.trashCount > 0 {
                     Button("Ouvrir la corbeille") { showTrash = true }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.glassProminent)
                 }
             }
         }
@@ -152,15 +168,18 @@ struct SortingView: View {
     // MARK: - Boutons
 
     private var controls: some View {
-        HStack(spacing: 32) {
-            roundButton(systemImage: "xmark", color: .red, size: 64) { swipe(.trash) }
-                .accessibilityLabel("Supprimer")
-            roundButton(systemImage: "arrow.uturn.backward", color: .orange, size: 48) { undo() }
-                .disabled(!viewModel.canUndo)
-                .opacity(viewModel.canUndo ? 1 : 0.4)
-                .accessibilityLabel("Annuler")
-            roundButton(systemImage: "heart.fill", color: .green, size: 64) { swipe(.keep) }
-                .accessibilityLabel("Garder")
+        // Le conteneur permet aux formes en verre voisines de se fondre entre elles.
+        GlassEffectContainer(spacing: 32) {
+            HStack(spacing: 32) {
+                roundButton(systemImage: "xmark", color: .red, size: 64) { swipe(.trash) }
+                    .accessibilityLabel("Supprimer")
+                roundButton(systemImage: "arrow.uturn.backward", color: .orange, size: 48) { undo() }
+                    .disabled(!viewModel.canUndo)
+                    .opacity(viewModel.canUndo ? 1 : 0.5)
+                    .accessibilityLabel("Annuler")
+                roundButton(systemImage: "heart.fill", color: .green, size: 64) { swipe(.keep) }
+                    .accessibilityLabel("Garder")
+            }
         }
         .disabled(viewModel.queue.isEmpty && !viewModel.canUndo)
     }
@@ -171,10 +190,10 @@ struct SortingView: View {
                 .font(.system(size: size * 0.4, weight: .bold))
                 .foregroundStyle(color)
                 .frame(width: size, height: size)
-                .background(Circle().fill(Color(.systemBackground)))
-                .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
+                .contentShape(.circle)
         }
         .buttonStyle(.plain)
+        .glassEffect(.regular.interactive(), in: .circle)
     }
 
     // MARK: - Actions
